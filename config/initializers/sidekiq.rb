@@ -3,18 +3,14 @@ require Rails.root.join('lib/redis/config')
 schedule_file = 'config/schedule.yml'
 
 Sidekiq.configure_client do |config|
-  config.redis = {
-    url: ENV["REDIS_URL"],
-    ssl_params: { verify_mode: OpenSSL::SSL::VERIFY_NONE }
-}
+  config.redis = { url: "#{ENV['REDIS_URL']}?ssl_cert_reqs=none", size: 1, network_timeout: 5, 
+    ssl_params: { verify_mode: OpenSSL::SSL::VERIFY_NONE } }
 end
 
 Sidekiq.configure_server do |config|
   config.logger.formatter = Sidekiq::Logger::Formatters::JSON.new
-  config.redis = {
-    url: ENV["REDIS_URL"],
-    ssl_params: { verify_mode: OpenSSL::SSL::VERIFY_NONE }
-  }
+  config.redis = { url: "#{ENV['REDIS_URL']}?ssl_cert_reqs=none", size: 7, network_timeout: 5, 
+    ssl_params: { verify_mode: OpenSSL::SSL::VERIFY_NONE } }
   # skip the default start stop logging
   config[:skip_default_job_logging] = true
   config.logger.level = Logger.const_get(ENV.fetch('LOG_LEVEL', 'info').upcase.to_s)
